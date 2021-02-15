@@ -1,0 +1,13 @@
+{
+  "name": "RFM69 Decoder",
+  "apiVersion": "1.0.0",
+  "author": "Alex M.",
+  "version": "0.0.1",
+  "description": "Decodes register reads and writes to the RFM69 radio.",
+  "extensions": {
+    "RFM69 Decoder": {
+      "type": "HighLevelAnalyzer",
+      "entryPoint": "HighLevelAnalyzer.Hla"
+    }
+  }
+}
