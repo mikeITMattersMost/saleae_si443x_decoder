@@ -40,11 +40,21 @@ regs = {
 }
 
 
+def get_reg_name(address: int) -> str:
+    """ Get the register name by address. """
+    try:
+        return regs[address]
+    except KeyError:
+        return "INVALID"
+
+
 class Hla(HighLevelAnalyzer):
     """ RFM69 High Level Analyzer. """
 
     result_types = {
         "address": {"format": "{{data.rw}} {{data.reg}}"},
+        "read": {"format": "{{data.rw}} {{data.reg}} {{data.value}}"},
+        "write": {"format": "{{data.rw}} {{data.reg}} {{data.value}}"},
     }
 
     def __init__(self):
@@ -53,6 +63,10 @@ class Hla(HighLevelAnalyzer):
         # Previous frame type
         # https://support.saleae.com/extensions/analyzer-frame-types/spi-analyzer
         self._previous_type: str = ""
+        # current address
+        self._address: Optional[int] = None
+        # current access type
+        self._rw: str = ""
 
     def decode(
         self, frame: AnalyzerFrame
@@ -61,35 +75,52 @@ class Hla(HighLevelAnalyzer):
         is_first_byte: bool = self._previous_type == "enable"
         self._previous_type: str = frame.type
 
-        if frame.type != "result" or not is_first_byte:
+        if frame.type != "result":
             return None
 
         mosi: bytes = frame.data["mosi"]
-        # miso: bytes = frame.data["miso"]
+        miso: bytes = frame.data["miso"]
 
-        try:
-            address = mosi[0]
-        except IndexError:
-            return None
+        if is_first_byte:
+            try:
+                self._address = mosi[0]
+            except IndexError:
+                return None
 
-        is_write: bool = address & 0x80 != 0
+            self._rw = "Write" if self._address & 0x80 != 0 else "Read"
 
-        # normalize the address, removing the write bit
-        address &= 0x7F
+            # normalize the address, removing the write bit
+            self._address &= 0x7F
 
-        try:
-            reg_name = regs[address]
-        except KeyError:
-            reg_name = "INVALID"
-
-        if is_write:
-            rw = "Write"
+            return AnalyzerFrame(
+                "address",
+                start_time=frame.start_time,
+                end_time=frame.end_time,
+                data={"reg": get_reg_name(self._address), "rw": self._rw},
+            )
         else:
-            rw = "Read"
+            if self._rw.lower() == "write":
+                try:
+                    byte = mosi[0]
+                except IndexError:
+                    return None
+            else:
+                try:
+                    byte = miso[0]
+                except IndexError:
+                    return None
 
-        return AnalyzerFrame(
-            "address",
-            start_time=frame.start_time,
-            end_time=frame.end_time,
-            data={"reg": reg_name, "rw": rw},
-        )
+            ret = AnalyzerFrame(
+                self._rw.lower(),
+                start_time=frame.start_time,
+                end_time=frame.end_time,
+                data={
+                    "reg": get_reg_name(self._address),
+                    "rw": self._rw,
+                    "value": f"0x{byte:02X}",
+                },
+            )
+
+            self._address += 1
+            self._address &= 0x7F
+            return ret
