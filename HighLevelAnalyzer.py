@@ -44,8 +44,7 @@ class Hla(HighLevelAnalyzer):
     """ RFM69 High Level Analyzer. """
 
     result_types = {
-        "reg_read": {"format": "Read {{data.reg}}"},
-        "reg_write": {"format": "Write {{data.reg}}"},
+        "address": {"format": "{{data.rw}} {{data.reg}}"},
     }
 
     def __init__(self):
@@ -79,18 +78,18 @@ class Hla(HighLevelAnalyzer):
         address &= 0x7F
 
         try:
-            reg_name = "Reg" + regs[address]
+            reg_name = regs[address]
         except KeyError:
             reg_name = "INVALID"
 
         if is_write:
-            result_type = "reg_write"
+            rw = "Write"
         else:
-            result_type = "reg_read"
+            rw = "Read"
 
         return AnalyzerFrame(
-            result_type,
+            "address",
             start_time=frame.start_time,
             end_time=frame.end_time,
-            data={"reg": reg_name},
+            data={"reg": reg_name, "rw": rw},
         )
