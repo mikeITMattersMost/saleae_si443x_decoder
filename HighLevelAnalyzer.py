@@ -24,6 +24,13 @@ regs = {
     0x2D: "PreambleLsb",
     0x2E: "SyncConfig",
     0x2F: "SyncValue1",
+    0x30: "SyncValue2",
+    0x31: "SyncValue3",
+    0x32: "SyncValue4",
+    0x33: "SyncValue5",
+    0x34: "SyncValue6",
+    0x35: "SyncValue7",
+    0x36: "SyncValue8",
     0x37: "PacketConfig1",
     0x3C: "FifoThresh",
     0x3D: "PacketConfig2",
@@ -121,6 +128,8 @@ class Hla(HighLevelAnalyzer):
                 },
             )
 
-            self._address += 1
-            self._address &= 0x7F
+            if self._address != 0x00:  # FIFO
+                self._address += 1
+                self._address &= 0x7F
+
             return ret
