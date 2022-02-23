@@ -8,3 +8,5 @@ Decodes register reads and writes to the Silicon Labs Si4430/31/32 radio.
 * Annotates following bytes with "Read {register} {value}" or "Write {register} {value}"
 
 
+## Example
+![Example](https://github.com/mikeITMattersMost/saleae_si443x_decoder/blob/main/sihla_demo.png?raw=true)
