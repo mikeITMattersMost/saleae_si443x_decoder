@@ -1,11 +1,11 @@
 {
-  "name": "RFM69 Decoder",
+  "name": "Si4430/31/32 Protocol Decoder",
   "apiVersion": "1.0.0",
-  "author": "Alex M.",
-  "version": "0.1.2",
-  "description": "Decodes register reads and writes to the RFM69 radio.",
+  "author": "Michael S.",
+  "version": "0.0.1",
+  "description": "Decodes communication between a host MCU and a Si4430/31/32 ISM Transceiver. Works on top of the SPI analyzer",
   "extensions": {
-    "RFM69 Decoder": {
+    "Si4430/31/32 Protocol Decoder": {
       "type": "HighLevelAnalyzer",
       "entryPoint": "HighLevelAnalyzer.Hla"
     }
