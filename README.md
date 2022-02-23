@@ -1,6 +1,8 @@
 # Si4430/31/32 Decoder
   
 Decodes register reads and writes to the Silicon Labs Si4430/31/32 radio.
+This is a fork from [saleae_rfm69_decoder ](https://github.com/newAM/saleae_rfm69_decoder) which I mainly modified to match the registers of the Si443x ICs.
+
 
 ## Features
 
